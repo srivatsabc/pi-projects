@@ -1,1 +1,1 @@
-Optical Recognition by Srivatsa
+Srivatsa
