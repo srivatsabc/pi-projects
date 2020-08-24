@@ -1,1 +1,0 @@
-Optical Recognition by Srivatsa
