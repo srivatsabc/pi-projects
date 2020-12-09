@@ -43,7 +43,7 @@ while (True):
 								})
 		print('Send response : ' + str(eventhub_api_response))
 		print('\n')
-		print('Waiting for next scan ...')
+		print('Waiting for next item scan ...')
 		print('\n')
 	finally:
 		GPIO.cleanup()
