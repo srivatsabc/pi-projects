@@ -7,7 +7,6 @@ import logging
 import msal
 import sys
 import os
-#sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'myHttpTrigger')))
 import app_config
 import requests
 import json
