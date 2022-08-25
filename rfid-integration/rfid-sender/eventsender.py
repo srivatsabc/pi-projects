@@ -7,11 +7,11 @@ import logging
 import msal
 import sys
 import os
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__),
-                '..', 'myHttpTrigger')))
+#sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'myHttpTrigger')))
 import app_config
 import requests
 import json
+import geocoder
 
 print('\n')
 print("Waiting for item scan ...")
@@ -33,14 +33,19 @@ while (True):
 		if not result:
 			result = app.acquire_token_for_client(scopes=app_config.SCOPE)
 			print("Got token : " + str(result['access_token']))			
-		#data = json.dumps(text)
-		#logging.info('msg ' + str(data))
+		geo_location = geocoder.ip("me")
+		
+		msg = {}
+		msg["container_id"] = text.rstrip()
+		msg["latitude"] = geo_location.latlng[0]
+		msg["longitude"] = geo_location.latlng[1]
+		print('msg ' + str(json.dumps(msg)))
 		print("Sending item to event hubs ")
 		eventhub_api_response = requests.post(app_config.WRITE_ENDPOINT,
-									data=text,
-									headers={'Authorization': 'Bearer ' + result['access_token'], 
-									'Content-Type': 'application/atom+xml;type=entry;charset=utf-8'
-								})
+			data=json.dumps(msg),
+			headers={'Authorization': 'Bearer ' + result['access_token'], 
+			'Content-Type': 'application/atom+xml;type=entry;charset=utf-8'
+		})
 		print('Send response : ' + str(eventhub_api_response))
 		print('\n')
 		print('Waiting for next item scan ...')
