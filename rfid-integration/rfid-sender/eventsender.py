@@ -11,6 +11,7 @@ import app_config
 import requests
 import json
 import geocoder
+import random
 
 print('\n')
 print("Waiting for item scan ...")
@@ -31,13 +32,17 @@ while (True):
 		result = None
 		if not result:
 			result = app.acquire_token_for_client(scopes=app_config.SCOPE)
-			print("Got token : " + str(result['access_token']))			
+			#print("Got token : " + str(result['access_token']))			
 		geo_location = geocoder.ip("me")
 		
 		msg = {}
-		msg["container_id"] = text.rstrip()
-		msg["latitude"] = geo_location.latlng[0]
-		msg["longitude"] = geo_location.latlng[1]
+		rfid = str(text.rstrip()).split(',')
+		msg["container_id"] = rfid[0]
+		msg["latitude"] = float(rfid[1])
+		msg["longitude"] = float(rfid[2])
+		msg["origin_id"] = "N"
+		msg["destination_id"] = "N"
+		msg["status"] = "InProgress"
 		print('msg ' + str(json.dumps(msg)))
 		print("Sending item to event hubs ")
 		eventhub_api_response = requests.post(app_config.WRITE_ENDPOINT,
