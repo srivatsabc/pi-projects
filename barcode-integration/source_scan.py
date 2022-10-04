@@ -30,7 +30,7 @@ def send_barcode(product_id):
         client_credential=app_config.CLIENT_SECRET)
     result = app.acquire_token_for_client(scopes=app_config.SCOPE)
     print("Got token : " + str(result['access_token']))		
-    api_response = requests.post(app_config.WRITE_ENDPOINT,
+    api_response = requests.post(app_config.SOURCE_ENDPOINT,
         data=json.dumps(msg),
         headers={'Authorization': 'Bearer ' + result['access_token'],
         'Content-Type': 'application/json'

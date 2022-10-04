@@ -12,13 +12,10 @@ import requests
 import json
 import geocoder
 import random
-
-print('\n')
-print("Waiting for item scan ...")
 print('\n')
 while (True):
+	print("Waiting for item scan ...")
 	reader = SimpleMFRC522()
-
 	try:
 		(id, text) = reader.read()
 		print ("Scan Detected")
