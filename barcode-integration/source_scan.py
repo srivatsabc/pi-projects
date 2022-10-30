@@ -19,25 +19,26 @@ scancodes = {
 }
 
 def send_barcode(product_id):
-    print("Inside sending barcode")
     msg = {}
     msg["container_id"] = "Container-X018792"
     msg["product_id"] = product_id
-    print('msg ' + str(json.dumps(msg)))
-    print("Sending to app ")
+    #print('msg ' + str(json.dumps(msg)))
     app = msal.ConfidentialClientApplication(app_config.CLIENT_ID, 
         authority=app_config.AUTHORITY, 
         client_credential=app_config.CLIENT_SECRET)
     result = app.acquire_token_for_client(scopes=app_config.SCOPE)
-    print("Got token : " + str(result['access_token']))		
+    #print("Got token : " + str(result['access_token']))		
     api_response = requests.post(app_config.SOURCE_ENDPOINT,
         data=json.dumps(msg),
         headers={'Authorization': 'Bearer ' + result['access_token'],
         'Content-Type': 'application/json'
     })
-    print('Send response : ' + str(api_response))
+    print("Sending item to IoT hub completed " + str(api_response))
+    print ("=========================================================")
     print('\n')
-    print('Waiting for next item scan ...')
+    print ("=========================================================")
+    print('Waiting for barcode item scan ...')
+    print ("=========================================================")
     print('\n')
 
 def signal_handler(signal, frame):
@@ -48,10 +49,10 @@ def signal_handler(signal, frame):
 
 if __name__ == '__main__':
     # find usb hid device
-    print("barCodeDeviceString " + barCodeDeviceString)
+    #print("barCodeDeviceString " + barCodeDeviceString)
     devices = map(InputDevice, list_devices())
     for device in devices:
-        print("name " + device.name)
+        #print("name " + device.name)
         if barCodeDeviceString in device.name.rstrip():
             dev = InputDevice(device.fn)
             break
@@ -61,19 +62,25 @@ if __name__ == '__main__':
 
     signal.signal(signal.SIGINT, signal_handler)
     dev.grab()
-    print ("Here")
     # process usb hid events and format barcode data
     barcode = ""
+    print ("=========================================================")
+    print("Waiting for barcode item scan ...")
+    print ("=========================================================")
+    print('\n')
     try:
         for event in dev.read_loop():
-            print ("Trying Sending barcode for")
             if event.type == ecodes.EV_KEY:
                 data = categorize(event)
                 if data.keystate == 1 and data.scancode != 42: # Catch only keydown, and not Enter
                     key_lookup = scancodes.get(data.scancode) or u'UNKNOWN:{}'.format(data.scancode) # lookup corresponding ascii value
                     if data.scancode == 28: # if enter detected print barcode value and then clear it
-                        print (barcode)
-                        print ("Sending barcode")
+                        print ("=========================================================")
+                        print ("Scan Detected")
+                        print ("item code : " + str(barcode))
+                        print("Connecting to Cloud to send message")
+                        #print (barcode)
+                        #print ("Sending barcode")
                         send_barcode(barcode)
                         barcode = ""
                     else:

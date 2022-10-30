@@ -14,14 +14,17 @@ import geocoder
 import random
 print('\n')
 while (True):
-	print("Waiting for item scan ...")
+	print ("=========================================================")
+	print("Waiting for container (RFID) scan ...")
+	print ("=========================================================")
+	print('\n')
 	reader = SimpleMFRC522()
 	try:
 		(id, text) = reader.read()
+		print ("=========================================================")
 		print ("Scan Detected")
 		print ("item code : " + str(id))
-		print ("item details : " + text)
-		print("Connecting to Azure AD for token ")
+		print("Connecting to Cloud to send message")
 		
 		app = msal.ConfidentialClientApplication(app_config.CLIENT_ID,
 				authority=app_config.AUTHORITY,
@@ -41,15 +44,13 @@ while (True):
 		msg["destination_id"] = "N"
 		msg["status"] = "InProgress"
 		print('msg ' + str(json.dumps(msg)))
-		print("Sending item to event hubs ")
 		eventhub_api_response = requests.post(app_config.WRITE_ENDPOINT,
 			data=json.dumps(msg),
 			headers={'Authorization': 'Bearer ' + result['access_token'], 
 			'Content-Type': 'application/atom+xml;type=entry;charset=utf-8'
 		})
-		print('Send response : ' + str(eventhub_api_response))
-		print('\n')
-		print('Waiting for next item scan ...')
+		print("Sending item to IoT hub completed " + str(eventhub_api_response))
+		print ("=========================================================")
 		print('\n')
 	finally:
 		GPIO.cleanup()
