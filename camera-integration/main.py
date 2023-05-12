@@ -16,14 +16,10 @@ from requests_toolbelt import MultipartEncoder
 # Setup logging
 logger = logging.getLogger("logging_tryout2")
 logger.setLevel(logging.DEBUG)
-# create console handler and set level to debug
 ch = logging.StreamHandler()
 ch.setLevel(logging.DEBUG)
-# create formatter
 formatter = logging.Formatter("%(asctime)s;%(levelname)s;%(message)s")
-# add formatter to ch
 ch.setFormatter(formatter)
-# add ch to logger
 logger.addHandler(ch)
 
 # Method to get jwt token for accessing the ML api
@@ -43,6 +39,8 @@ def capture_image():
   config = picam.create_preview_configuration()
   picam.configure(config)
   picam.start()
+  picam.exposure_mode = 'beach'
+  picam.awb_mode = 'sunlight'
   sleep(2)
   image = f"images/camera_caputure_{str(uuid.uuid4())}.jpg"
   picam.capture_file(image)
