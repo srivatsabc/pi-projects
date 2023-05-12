@@ -25,9 +25,9 @@ logger.addHandler(ch)
 # Method to get jwt token for accessing the ML api
 @cached(cache=TTLCache(maxsize=1, ttl=3500))
 def get_ad_token(scope=configs.SCOPE):
-  app = msal.ConfidentialClientApplication(configs.CLIENT_ID,
+  app = msal.ConfidentialClientApplication(os.environ.get('CLIENT_ID'),
           authority=configs.AUTHORITY,
-          client_credential=configs.CLIENT_SECRET)
+          client_credential=os.environ.get('CLIENT_SECRET'))
   result = None
   if not result:
     result = app.acquire_token_for_client(scopes=scope)
