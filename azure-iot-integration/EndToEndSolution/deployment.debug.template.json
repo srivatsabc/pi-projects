@@ -57,13 +57,69 @@
           }
         },
         "modules": {
-          "messageDispatcher": {
+          "weatherSensor": {
             "version": "1.0",
             "type": "docker",
             "status": "running",
             "restartPolicy": "always",
             "settings": {
-              "image": "${MODULES.messageDispatcher.debug}",
+              "image": "${MODULES.weatherSensor.debug}",
+              "createOptions": {
+                "ExposedPorts": {
+                  "5678/tcp": {}
+                },
+                "HostConfig": {
+                  "PortBindings": {
+                    "5678/tcp": [
+                      {
+                        "HostPort": "5678"
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "SimulatedTemperatureSensor": {
+            "version": "1.0",
+            "type": "docker",
+            "status": "running",
+            "restartPolicy": "always",
+            "settings": {
+              "image": "mcr.microsoft.com/azureiotedge-simulated-temperature-sensor:1.0",
+              "createOptions": {}
+            }
+          },
+          "deviceToCloudAgent": {
+            "version": "1.0",
+            "type": "docker",
+            "status": "running",
+            "restartPolicy": "always",
+            "settings": {
+              "image": "${MODULES.deviceToCloudAgent.debug}",
+              "createOptions": {
+                "ExposedPorts": {
+                  "5678/tcp": {}
+                },
+                "HostConfig": {
+                  "PortBindings": {
+                    "5678/tcp": [
+                      {
+                        "HostPort": "5678"
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "cloudToDeviceAgent": {
+            "version": "1.0",
+            "type": "docker",
+            "status": "running",
+            "restartPolicy": "always",
+            "settings": {
+              "image": "${MODULES.cloudToDeviceAgent.debug}",
               "createOptions": {
                 "ExposedPorts": {
                   "5678/tcp": {}
@@ -102,75 +158,6 @@
                 }
               }
             }
-          },
-          "WeatherStation": {
-            "version": "1.0",
-            "type": "docker",
-            "status": "running",
-            "restartPolicy": "always",
-            "settings": {
-              "image": "${MODULES.WeatherStation.debug}",
-              "createOptions": {
-                "ExposedPorts": {
-                  "5678/tcp": {}
-                },
-                "HostConfig": {
-                  "PortBindings": {
-                    "5678/tcp": [
-                      {
-                        "HostPort": "5678"
-                      }
-                    ]
-                  }
-                }
-              }
-            }
-          },
-          "MessageReciver": {
-            "version": "1.0",
-            "type": "docker",
-            "status": "running",
-            "restartPolicy": "always",
-            "settings": {
-              "image": "${MODULES.MessageReciver.debug}",
-              "createOptions": {
-                "ExposedPorts": {
-                  "5678/tcp": {}
-                },
-                "HostConfig": {
-                  "PortBindings": {
-                    "5678/tcp": [
-                      {
-                        "HostPort": "5678"
-                      }
-                    ]
-                  }
-                }
-              }
-            }
-          },
-          "MessageReceiver": {
-            "version": "1.0",
-            "type": "docker",
-            "status": "running",
-            "restartPolicy": "always",
-            "settings": {
-              "image": "${MODULES.MessageReceiver.debug}",
-              "createOptions": {
-                "ExposedPorts": {
-                  "5678/tcp": {}
-                },
-                "HostConfig": {
-                  "PortBindings": {
-                    "5678/tcp": [
-                      {
-                        "HostPort": "5678"
-                      }
-                    ]
-                  }
-                }
-              }
-            }
           }
         }
       }
@@ -179,11 +166,11 @@
       "properties.desired": {
         "schemaVersion": "1.1",
         "routes": {
-          "messageDispatcherToIoTHub": "FROM /messages/modules/messageDispatcher/outputs/* INTO $upstream",
-          "rfidSensorTomessageDispatcher": "FROM /messages/modules/rfidSensor/outputs/* INTO BrokeredEndpoint(\"/modules/messageDispatcher/inputs/input1\")",
-          "WeatherStationToIoTHub": "FROM /messages/modules/WeatherStation/outputs/* INTO $upstream",
-          "MessageReciverToIoTHub": "FROM /messages/modules/MessageReciver/outputs/* INTO $upstream",
-          "MessageReceiverToIoTHub": "FROM /messages/modules/MessageReceiver/outputs/* INTO $upstream"
+          "weatherSensorToIoTHub": "FROM /messages/modules/weatherSensor/outputs/* INTO $upstream",
+          "sensorToweatherSensor": "FROM /messages/modules/SimulatedTemperatureSensor/outputs/temperatureOutput INTO BrokeredEndpoint(\"/modules/weatherSensor/inputs/input1\")",
+          "deviceToCloudAgentToIoTHub": "FROM /messages/modules/deviceToCloudAgent/outputs/* INTO $upstream",
+          "cloudToDeviceAgentToIoTHub": "FROM /messages/modules/cloudToDeviceAgent/outputs/* INTO $upstream",
+          "rfidSensorToIoTHub": "FROM /messages/modules/rfidSensor/outputs/* INTO $upstream"
         },
         "storeAndForwardConfiguration": {
           "timeToLiveSecs": 7200

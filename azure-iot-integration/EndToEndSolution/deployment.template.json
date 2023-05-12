@@ -57,43 +57,13 @@
           }
         },
         "modules": {
-          "deviceToCloudAgent": {
-            "version": "1.0",
-            "type": "docker",
-            "status": "running",
-            "restartPolicy": "always",
-            "settings": {
-              "image": "${MODULES.DeviceToCloudAgent}",
-              "createOptions": {}
-            }
-          },
-          "rfidSensor": {
-            "version": "1.0",
-            "type": "docker",
-            "status": "running",
-            "restartPolicy": "always",
-            "settings": {
-              "image": "${MODULES.RfidSensor}",
-              "createOptions": {
-                "HostConfig": {
-                  "Devices": [
-                    {
-                      "PathOnHost": "/dev/ttyS0",
-                      "PathInContainer": "/dev/ttyS0",
-                      "CgroupPermissions": "rwm"
-                    }
-                  ]
-                }
-              }
-            }
-          },
           "weatherSensor": {
             "version": "1.0",
             "type": "docker",
             "status": "running",
             "restartPolicy": "always",
             "settings": {
-              "image": "${MODULES.WeatherSensor}",
+              "image": "${MODULES.weatherSensor}",
               "createOptions": {
                 "HostConfig": {
                   "Devices": [
@@ -122,14 +92,44 @@
               }
             }
           },
+          "deviceToCloudAgent": {
+            "version": "1.0",
+            "type": "docker",
+            "status": "running",
+            "restartPolicy": "always",
+            "settings": {
+              "image": "${MODULES.deviceToCloudAgent}",
+              "createOptions": {}
+            }
+          },
           "cloudToDeviceAgent": {
             "version": "1.0",
             "type": "docker",
             "status": "running",
             "restartPolicy": "always",
             "settings": {
-              "image": "${MODULES.CloudToDeviceAgent}",
+              "image": "${MODULES.cloudToDeviceAgent}",
               "createOptions": {}
+            }
+          },
+          "rfidSensor": {
+            "version": "1.0",
+            "type": "docker",
+            "status": "running",
+            "restartPolicy": "always",
+            "settings": {
+              "image": "${MODULES.rfidSensor}",
+              "createOptions": {
+                "HostConfig": {
+                  "Devices": [
+                    {
+                      "PathOnHost": "/dev/ttyS0",
+                      "PathInContainer": "/dev/ttyS0",
+                      "CgroupPermissions": "rwm"
+                    }
+                  ]
+                }
+              }
             }
           }
         }
@@ -139,9 +139,9 @@
       "properties.desired": {
         "schemaVersion": "1.1",
         "routes": {
-          "DeviceToCloudAgentToIoTHub": "FROM /messages/modules/DeviceToCloudAgent/outputs/* INTO $upstream",
-          "RfidSensorToDeviceToCloudAgent": "FROM /messages/modules/RfidSensor/outputs/* INTO BrokeredEndpoint(\"/modules/DeviceToCloudAgent/inputs/input1\")",
-          "WeatherSensorToDeviceToCloudAgent": "FROM /messages/modules/WeatherSensor/outputs/* INTO BrokeredEndpoint(\"/modules/DeviceToCloudAgent/inputs/input1\")"
+          "weatherSensorTodeviceToCloudAgent": "FROM /messages/modules/weatherSensor/outputs/* INTO BrokeredEndpoint(\"/modules/deviceToCloudAgent/inputs/input1\")",
+          "deviceToCloudAgentToIoTHub": "FROM /messages/modules/deviceToCloudAgent/outputs/* INTO $upstream",
+          "rfidSensorTodeviceToCloudAgent": "FROM /messages/modules/rfidSensor/outputs/* INTO BrokeredEndpoint(\"/modules/deviceToCloudAgent/inputs/input1\")"
         },
         "storeAndForwardConfiguration": {
           "timeToLiveSecs": 7200

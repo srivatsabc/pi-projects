@@ -19,11 +19,13 @@ def create_client():
         # NOTE: This function only handles messages sent to "input1".
         # Messages sent to other inputs, or to the default, will be discarded
         if message.input_name == "input1":
-            print(message.data.decode('utf-8'))
+            print("\n" + message.data.decode('utf-8'))
             print(message.custom_properties)
             print("Forwarding mesage to Iot Hub")
             await client.send_message_to_output(message, "output1")
-
+        else:
+            print("Generic message received ")
+            print(message.data)
     try:
         # Set handler on the client
         client.on_message_received = receive_message_handler
@@ -43,14 +45,14 @@ async def run_sample(client):
 def main():
     if not sys.version >= "3.5.3":
         raise Exception( "The sample requires python 3.5.3+. Current version of Python: %s" % sys.version )
-    print ( "IoT Hub Client for Python" )
+    print ( "Waiting for messages from sensor agents" )
 
     # NOTE: Client is implicitly connected due to the handler being set on it
     client = create_client()
 
     # Define a handler to cleanup when module is is terminated by Edge
     def module_termination_handler(signal, frame):
-        print ("IoTHubClient sample stopped by Edge")
+        print ("deviceToCloudAgent stopped by Edge")
         stop_event.set()
 
     # Set the Edge termination handler
