@@ -12,6 +12,7 @@ import os
 import msal
 import requests
 from requests_toolbelt import MultipartEncoder
+from gpiozero import Buzzer
 
 # Setup logging
 logger = logging.getLogger("logging_tryout2")
@@ -71,14 +72,18 @@ def predict(image):
   else:
     response = response.json()
     logger.info(f"Class: {response['class']}")
-    if response['class'] == configs.CLASS_OK:
-      os.remove(image)
+    if response['class'] == configs.CLASS_NOT_OK:
+      buzzer.on()
+      sleep(1)
+      buzzer.off()
+    os.remove(image)
     return response
 
 # GPIO warmup
 GPIO.setwarnings(False)
 GPIO.setmode(GPIO.BOARD)
 GPIO.setup(12, GPIO.IN)
+buzzer = Buzzer(17)
 sleep(10)
 
 # Loop to monitor PIR motion sensor 

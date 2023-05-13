@@ -4,3 +4,4 @@ picamera2==0.3.9
 Requests==2.30.0
 requests_toolbelt==1.0.0
 RPi.GPIO==0.7.1
+gpiozero
