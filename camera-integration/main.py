@@ -13,6 +13,7 @@ import msal
 import requests
 from requests_toolbelt import MultipartEncoder
 from gpiozero import Buzzer
+from espeak import espeak
 
 # Setup logging
 logger = logging.getLogger("logging_tryout2")
@@ -64,7 +65,8 @@ def predict(image):
     data=mp_encoder,
     headers={'Authorization': 'Bearer ' + token,
             'Content-Type': mp_encoder.content_type
-            }
+            },
+    timeout=20
   )
   
   if response.status_code != 200:
@@ -73,6 +75,8 @@ def predict(image):
     response = response.json()
     logger.info(f"Class: {response['class']}")
     if response['class'] == configs.CLASS_NOT_OK:
+      espeak.synth("Alert. Intruders with guns detected!")
+      sleep(2)
       buzzer.on()
       sleep(1)
       buzzer.off()
